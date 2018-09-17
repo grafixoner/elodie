@@ -322,6 +322,7 @@ class FileSystem(object):
 
     def process_file(self, _file, destination, media, **kwargs):
         move = False
+        movedir = '/var/cloud/processed/'
         if('move' in kwargs):
             move = kwargs['move']
 
@@ -336,6 +337,11 @@ class FileSystem(object):
         db = Db()
         checksum = db.checksum(_file)
         if(checksum is None):
+            if(move is True):
+                stat = os.stat(_file)
+                shutil.move(_file, movedir)
+                os.utime(movedir, (stat.st_atime, stat.st_mtime))
+
             log.info('Could not get checksum for %s. Skipping...' % _file)
             return
 
@@ -378,6 +384,12 @@ class FileSystem(object):
         if(os.path.isfile(dest_path)):
             db.add_hash(checksum, dest_path)
             db.update_hash_db()
+            
+            if(move is True):
+                stat = os.stat(_file)
+                shutil.move(_file, movedir)
+                os.utime(movedir, (stat.st_atime, stat.st_mtime))
+
             log.info('%s already exists at %s. Skipping at os.path ...' % (_file,dest_path))
             return
 
@@ -390,9 +402,13 @@ class FileSystem(object):
         self.create_directory(dest_directory)
 
         if(move is True):
+            compatability._copyfile(_file, dest_path)
+            self.set_utime_from_metadata(media.get_metadata(), dest_path)
+
             stat = os.stat(_file)
-            shutil.move(_file, dest_path)
-            os.utime(dest_path, (stat.st_atime, stat.st_mtime))
+            shutil.move(_file, movedir)
+            os.utime(movedir, (stat.st_atime, stat.st_mtime))
+
         else:
             compatability._copyfile(_file, dest_path)
             self.set_utime_from_metadata(media.get_metadata(), dest_path)

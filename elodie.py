@@ -33,7 +33,7 @@ from elodie.result import Result
 FILESYSTEM = FileSystem()
 
 
-def import_file(_file, destination, album_from_folder, trash, allow_duplicates):
+def import_file(_file, destination, album_from_folder, trash, allow_duplicates, move):
 
     _file = _decode(_file)
     destination = _decode(destination)
@@ -60,7 +60,7 @@ def import_file(_file, destination, album_from_folder, trash, allow_duplicates):
     # if album_from_folder:
     #     media.set_album_from_folder()
 
-    dest_path = FILESYSTEM.process_file(_file, destination, media, allowDuplicate=allow_duplicates, move=False)
+    dest_path = FILESYSTEM.process_file(_file, destination, media, allowDuplicate=allow_duplicates, move=move)
     if dest_path:
         print('%s -> %s' % (_file, dest_path))
     if trash:
@@ -74,6 +74,8 @@ def import_file(_file, destination, album_from_folder, trash, allow_duplicates):
               required=True, help='Copy imported files into this directory.')
 @click.option('--source', type=click.Path(file_okay=False),
               help='Import files from this directory, if specified.')
+@click.option('--move', default=False, is_flag=True,
+              help='Import the file even if it\'s already been imported.')
 @click.option('--file', type=click.Path(dir_okay=False),
               help='Import this file, if specified.')
 @click.option('--album-from-folder', default=False, is_flag=True,
@@ -111,7 +113,7 @@ def _import(destination, source, file, album_from_folder, trash, allow_duplicate
 
     for current_file in files:
         dest_path = import_file(current_file, destination, album_from_folder,
-                    trash, allow_duplicates)
+                    trash, allow_duplicates, move)
         result.append((current_file, dest_path))
         has_errors = has_errors is True or not dest_path
 

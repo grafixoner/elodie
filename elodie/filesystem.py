@@ -356,6 +356,10 @@ class FileSystem(object):
 
         if(allow_duplicate is False and checksum_file is not None):
             if(os.path.isfile(checksum_file)):
+                if(move is True):
+                    stat = os.stat(_file)
+                    shutil.move(_file, movedir)
+                    os.utime(movedir, (stat.st_atime, stat.st_mtime))
                 log.info('%s already exists at %s. Skipping...' % (
                     _file,
                     checksum_file

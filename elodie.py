@@ -87,7 +87,7 @@ def import_file(_file, destination, album_from_folder, trash, allow_duplicates, 
 @click.option('--debug', default=False, is_flag=True,
               help='Override the value in constants.py with True.')
 @click.argument('paths', nargs=-1, type=click.Path())
-def _import(destination, source, file, album_from_folder, trash, allow_duplicates, debug, paths):
+def _import(destination, source, file, album_from_folder, trash, allow_duplicates, debug, paths, move):
     """Import files or directories by reading their EXIF and organizing them accordingly.
     """
     constants.debug = debug

@@ -26,14 +26,12 @@ class Result(object):
                 error_result.append([id])
 
             print("****** ERROR DETAILS ******")
-            print(tabulate(error_result, headers=error_headers))
+
+            # print(tabulate(error_result, headers=error_headers))
             print("\n")
 
         headers = ["Metric", "Count"]
-        result = [
-                    ["Success", self.success],
-                    ["Error", self.error],
-                 ]
+        result = [["Success", self.success],["Error", self.error],]
 
         print("****** SUMMARY ******")
         print(tabulate(result, headers=headers))

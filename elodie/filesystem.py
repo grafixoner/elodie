@@ -333,20 +333,13 @@ class FileSystem(object):
             print('%s is not a valid media file. Skipping...' % _file)
             return
 
-        media.set_original_name()
-        metadata = media.get_metadata()
-
-        directory_name = self.get_folder_path(metadata)
-
-        dest_directory = os.path.join(destination, directory_name)
-        file_name = self.get_file_name(media)
-        dest_path = os.path.join(dest_directory, file_name)
-
         db = Db()
         checksum = db.checksum(_file)
         if(checksum is None):
             log.info('Could not get checksum for %s. Skipping...' % _file)
             return
+
+
 
         # If duplicates are not allowed then we check if we've seen this file
         #  before via checksum. We also check that the file exists at the
@@ -354,6 +347,7 @@ class FileSystem(object):
         # If we find a checksum match but the file doesn't exist where we
         #  believe it to be then we write a debug log and proceed to import.
         checksum_file = db.get_hash(checksum)
+
         if(allow_duplicate is False and checksum_file is not None):
             if(os.path.isfile(checksum_file)):
                 log.info('%s already exists at %s. Skipping...' % (
@@ -366,6 +360,26 @@ class FileSystem(object):
                     _file,
                     checksum_file
                 ))
+
+        # if album_from_folder:
+        media.set_album_from_folder()
+        
+        media.set_original_name()
+        metadata = media.get_metadata()
+
+        directory_name = self.get_folder_path(metadata)
+
+        dest_directory = os.path.join(destination, directory_name)
+        file_name = self.get_file_name(media)
+        dest_path = os.path.join(dest_directory, file_name)
+
+        # Just in case the checksum didn't get written but the file exists.
+        # TODO: check filesize or something to make sure they are the same. 
+        if(os.path.isfile(dest_path)):
+            db.add_hash(checksum, dest_path)
+            db.update_hash_db()
+            log.info('%s already exists at %s. Skipping at os.path ...' % (_file,dest_path))
+            return
 
         # If source and destination are identical then
         #  we should not write the file. gh-210

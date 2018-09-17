@@ -57,11 +57,10 @@ def import_file(_file, destination, album_from_folder, trash, allow_duplicates):
         print('{"source":"%s", "error_msg":"Not a supported file"}' % _file)
         return
 
-    if album_from_folder:
-        media.set_album_from_folder()
+    # if album_from_folder:
+    #     media.set_album_from_folder()
 
-    dest_path = FILESYSTEM.process_file(_file, destination,
-        media, allowDuplicate=allow_duplicates, move=False)
+    dest_path = FILESYSTEM.process_file(_file, destination, media, allowDuplicate=allow_duplicates, move=False)
     if dest_path:
         print('%s -> %s' % (_file, dest_path))
     if trash:
@@ -143,9 +142,10 @@ def _generate_db(source, debug):
     db.reset_hash_db()
 
     for current_file in FILESYSTEM.get_all_files(source):
+
         result.append((current_file, True))
         db.add_hash(db.checksum(current_file), current_file)
-        log.progress()
+        log.progress(str(current_file), True)
     
     db.update_hash_db()
     log.progress('', True)
@@ -192,7 +192,11 @@ def update_location(media, file_path, location_name):
             sys.exit(1)
     return True
 
+def update_created(media, file_path):
+    import pdb; pdb.set_trace()  # breakpoint 1ea7bc8f //
 
+
+    return True
 def update_time(media, file_path, time_string):
     """Update time exif metadata of media.
     """
@@ -218,11 +222,12 @@ def update_time(media, file_path, time_string):
 @click.option('--time', help=('Update the image time. Time should be in '
                               'YYYY-mm-dd hh:ii:ss or YYYY-mm-dd format.'))
 @click.option('--title', help='Update the image title.')
+@click.option('--created', help='Update the image album.')
 @click.option('--debug', default=False, is_flag=True,
               help='Override the value in constants.py with True.')
 @click.argument('paths', nargs=-1,
                 required=True)
-def _update(album, location, time, title, paths, debug):
+def _update(album, location, time, title, paths, debug, created):
     """Update a file's EXIF. Automatically modifies the file's location and file name accordingly.
     """
     constants.debug = debug
@@ -273,6 +278,9 @@ def _update(album, location, time, title, paths, debug):
             updated = True
         if album:
             media.set_album(album)
+            updated = True
+        if created:
+            update_created(media, current_file)
             updated = True
 
         # Updating a title can be problematic when doing it 2+ times on a file.

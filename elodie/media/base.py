@@ -164,6 +164,7 @@ class Base(object):
 
         :returns: bool
         """
+        
         metadata = self.get_metadata()
 
         # If this file has an album already set we do not overwrite EXIF

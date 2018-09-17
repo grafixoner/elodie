@@ -340,7 +340,7 @@ class FileSystem(object):
             if(move is True):
                 stat = os.stat(_file)
                 shutil.move(_file, movedir)
-                os.utime(movedir, (stat.st_atime, stat.st_mtime))
+                # os.utime(movedir, (stat.st_atime, stat.st_mtime))
 
             log.info('Could not get checksum for %s. Skipping...' % _file)
             return
@@ -359,7 +359,7 @@ class FileSystem(object):
                 if(move is True):
                     stat = os.stat(_file)
                     shutil.move(_file, movedir)
-                    os.utime(movedir, (stat.st_atime, stat.st_mtime))
+                    # os.utime(movedir, (stat.st_atime, stat.st_mtime))
                 log.info('%s already exists at %s. Skipping...' % (
                     _file,
                     checksum_file
@@ -392,7 +392,8 @@ class FileSystem(object):
             if(move is True):
                 stat = os.stat(_file)
                 shutil.move(_file, movedir)
-                os.utime(movedir, (stat.st_atime, stat.st_mtime))
+                self.set_utime_from_metadata(media.get_metadata(), dest_path)
+                # os.utime(movedir, (stat.st_atime, stat.st_mtime))
 
             log.info('%s already exists at %s. Skipping at os.path ...' % (_file,dest_path))
             return
@@ -408,11 +409,9 @@ class FileSystem(object):
         if(move is True):
             compatability._copyfile(_file, dest_path)
             self.set_utime_from_metadata(media.get_metadata(), dest_path)
-
-            stat = os.stat(_file)
             shutil.move(_file, movedir)
-            os.utime(movedir, (stat.st_atime, stat.st_mtime))
 
+        
         else:
             compatability._copyfile(_file, dest_path)
             self.set_utime_from_metadata(media.get_metadata(), dest_path)

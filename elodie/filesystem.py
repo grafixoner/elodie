@@ -392,7 +392,7 @@ class FileSystem(object):
             if(move is True):
                 stat = os.stat(_file)
                 shutil.move(_file, movedir)
-                self.set_utime_from_metadata(media.get_metadata(), dest_path)
+                # self.set_utime_from_metadata(media.get_metadata(), dest_path)
                 # os.utime(movedir, (stat.st_atime, stat.st_mtime))
 
             log.info('%s already exists at %s. Skipping at os.path ...' % (_file,dest_path))

@@ -93,7 +93,7 @@ def _import(destination, source, file, album_from_folder, trash, allow_duplicate
     constants.debug = debug
     has_errors = False
     result = Result()
-
+    move = move 
     destination = _decode(destination)
     destination = os.path.abspath(os.path.expanduser(destination))
 
